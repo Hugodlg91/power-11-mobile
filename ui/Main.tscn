@@ -1,0 +1,7 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="PackedScene" path="res://ui/PlayScreen.tscn" id="1_play"]
+
+[node name="Main" type="Node"]
+
+[node name="PlayScreen" parent="." instance=ExtResource("1_play")]

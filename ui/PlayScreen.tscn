@@ -1,0 +1,14 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://ui/PlayScreen.gd" id="1_script"]
+
+[node name="PlayScreen" type="Node2D"]
+script = ExtResource("1_script")
+
+[node name="BoardLabel" type="Label" parent="."]
+offset_left = 50.0
+offset_top = 50.0
+offset_right = 600.0
+offset_bottom = 600.0
+theme_override_font_sizes/font_size = 32
+text = "Loading..."
