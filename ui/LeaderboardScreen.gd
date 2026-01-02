@@ -15,7 +15,19 @@ func _ready() -> void:
 		
 	# Instantiate Manager
 	var DBClass = load("res://core/LeaderboardManager.gd")
+	if not DBClass:
+		print("LeaderboardScreen: Failed to load LeaderboardManager class")
+		msg_label.text = "Error: Cannot load leaderboard system"
+		msg_label.visible = true
+		return
+		
 	db_manager = DBClass.new()
+	if not db_manager:
+		print("LeaderboardScreen: Failed to create LeaderboardManager instance")
+		msg_label.text = "Error: Cannot initialize leaderboard"
+		msg_label.visible = true
+		return
+		
 	add_child(db_manager)
 	
 	_load_scores()
@@ -29,7 +41,7 @@ func _load_scores() -> void:
 	msg_label.visible = false
 	
 	if scores.is_empty():
-		msg_label.text = "No scores found."
+		msg_label.text = "No scores available. Check your internet connection."
 		msg_label.visible = true
 		return
 		

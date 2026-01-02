@@ -23,11 +23,17 @@ func _ready() -> void:
 	# Load Music
 	if FileAccess.file_exists(MUSIC_FILE):
 		var s = load(MUSIC_FILE)
-		if s:
-			s.loop_mode = 1 # AudioStreamWAV.LOOP_FORWARD
-			# Actually setting loop is done in Import tab. for wav it might not loop by default.
+		if s and s is AudioStreamWAV:
+			s.loop_mode = AudioStreamWAV.LOOP_FORWARD
 			music_player.stream = s
 			music_player.play()
+			print("SoundManager: Music loaded and playing")
+		elif s:
+			print("SoundManager: Music file loaded but wrong format (expected AudioStreamWAV)")
+		else:
+			print("SoundManager: Failed to load music file: " + MUSIC_FILE)
+	else:
+		print("SoundManager: Music file not found: " + MUSIC_FILE)
 	
 	# Connect to Settings
 	Settings.connect("volume_changed", _on_volume_changed)
@@ -39,18 +45,18 @@ func play(sfx_name: String) -> void:
 	if Settings.get_setting("sfx_muted", false):
 		return
 		
-	# Instancing new player for overlap support (common usage)
-	# Or pool. Let's do simple fire-and-forget instance.
-	
 	if not SOUND_FILES.has(sfx_name):
+		print("SoundManager: Unknown sound effect: " + sfx_name)
 		return
 		
 	var path = SOUND_FILES[sfx_name]
 	if not FileAccess.file_exists(path):
+		print("SoundManager: Sound file not found: " + path)
 		return
 		
 	var stream = load(path)
 	if not stream:
+		print("SoundManager: Failed to load sound: " + path)
 		return
 		
 	var p = AudioStreamPlayer.new()

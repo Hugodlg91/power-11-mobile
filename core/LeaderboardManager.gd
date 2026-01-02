@@ -89,6 +89,7 @@ func start_session(player_name: String = "Spectator") -> bool:
 	
 	# Create HTTPRequest node dynamically
 	var request = HTTPRequest.new()
+	request.timeout = 10.0  # 10 second timeout
 	add_child(request)
 	request.request(API_URL, headers, HTTPClient.METHOD_POST, json_payload)
 	
@@ -114,8 +115,12 @@ func start_session(player_name: String = "Spectator") -> bool:
 				_set_player_name_online(player_name)
 				
 			return true
+		else:
+			print("[ONLINE] Auth Error: JSON parse failed")
+			return false
 	
-	print("[ONLINE] Auth Error: Code %d" % response_code)
+	var error_body = body.get_string_from_utf8() if body.size() > 0 else "(empty)"
+	print("[ONLINE] Auth Error: Code %d, Body: %s" % [response_code, error_body])
 	return false
 
 func _set_player_name_online(p_name: String) -> void:
@@ -152,18 +157,21 @@ func submit_score(player_name: String, score: int) -> bool:
 	}
 	
 	var request = HTTPRequest.new()
+	request.timeout = 10.0  # 10 second timeout
 	add_child(request)
 	request.request(url, headers, HTTPClient.METHOD_POST, JSON.stringify(payload))
 	
 	var result = await request.request_completed
 	var response_code = result[1]
+	var body = result[3]
 	request.queue_free()
 	
 	if response_code == 200:
 		print("[ONLINE] Score submitted for %s: %d" % [player_name, score])
 		return true
 		
-	print("[ONLINE] Submit Error: %d" % response_code)
+	var error_body = body.get_string_from_utf8() if body.size() > 0 else "(empty)"
+	print("[ONLINE] Submit Error: Code %d, Body: %s" % [response_code, error_body])
 	return false
 
 ## Returns Array of Dictionary {rank, name, score}
@@ -178,6 +186,7 @@ func get_top_scores(count: int = 10) -> Array:
 	]
 	
 	var request = HTTPRequest.new()
+	request.timeout = 10.0  # 10 second timeout
 	add_child(request)
 	request.request(url, headers, HTTPClient.METHOD_GET)
 	
@@ -210,6 +219,10 @@ func get_top_scores(count: int = 10) -> Array:
 					"score": score
 				})
 			return final_list
+		else:
+			print("[ONLINE] Fetch Error: JSON parse failed")
+			return []
 			
-	print("[ONLINE] Fetch Error: %d" % response_code)
+	var error_body = body.get_string_from_utf8() if body.size() > 0 else "(empty)"
+	print("[ONLINE] Fetch Error: Code %d, Body: %s" % [response_code, error_body])
 	return []

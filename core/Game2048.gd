@@ -21,13 +21,16 @@ func reset() -> void:
 
 func _add_random_tile() -> bool:
 	var empties: Array[int] = bitboard.get_empty_positions(current_board_state)
+	print("_add_random_tile called, empties: ", empties.size())
 	if empties.is_empty():
+		print("  No empty positions!")
 		return false
 	
 	var pos: int = empties.pick_random()
 	# 90% chance of 2 (1), 10% chance of 4 (2)
 	var val: int = 1 if randf() < 0.9 else 2
 	current_board_state = bitboard.add_tile(current_board_state, pos, val)
+	print("  Added tile value=", (1 << val), " at pos=", pos)
 	return true
 
 func move(direction: String) -> bool:

@@ -8,22 +8,23 @@
 
 config_version=5
 
+[application]
+
+config/name="Power11mobile"
+run/main_scene="res://ui/MainMenu.tscn"
+config/features=PackedStringArray("4.5", "GL Compatibility")
+config/icon="res://icon.svg"
+
 [autoload]
 
 Settings="*res://core/Settings.gd"
 SoundManager="*res://core/SoundManager.gd"
-
-[application]
-
-config/name="Power11mobile"
-config/features=PackedStringArray("4.5", "GL Compatibility")
-config/icon="res://icon.svg"
-run/main_scene="res://ui/MainMenu.tscn"
+FontLoader="*res://core/FontLoader.gd"
 
 [rendering]
 
+textures/canvas_textures/default_texture_filter=0
 renderer/rendering_method="gl_compatibility"
 renderer/rendering_method.mobile="gl_compatibility"
 display/window/stretch/mode="viewport"
 display/window/stretch/aspect="expand"
-textures/canvas_textures/default_texture_filter=0

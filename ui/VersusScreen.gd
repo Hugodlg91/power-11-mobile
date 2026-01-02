@@ -32,10 +32,10 @@ var remaining_time: float = 0.0
 
 # THREADING
 var ai_thread: Thread
-var ai_semaphore: Semaphore # Not needed if standard thread flow
 var ai_mutex: Mutex
 var ai_move_pending = null
 var is_ai_thinking: bool = false
+var ai_should_stop: bool = false  # Shutdown signal
 var last_ai_move_time: float = 0.0
 
 func _ready() -> void:
@@ -55,8 +55,27 @@ func _ready() -> void:
 	ai_mutex = Mutex.new()
 
 func _exit_tree() -> void:
+	# Signal thread to stop
+	ai_mutex.lock()
+	ai_should_stop = true
+	ai_mutex.unlock()
+	
+	# Wait for thread to finish with timeout
 	if ai_thread.is_started():
-		ai_thread.wait_to_finish()
+		var start_time = Time.get_ticks_msec()
+		var timeout_ms = 2000  # 2 second timeout
+		
+		# Wait for thread with timeout
+		while ai_thread.is_alive():
+			if Time.get_ticks_msec() - start_time > timeout_ms:
+				push_error("VersusScreen: AI thread did not stop in time")
+				break
+			OS.delay_msec(10)  # Small delay to not busy-wait
+		
+		if ai_thread.is_alive():
+			push_warning("VersusScreen: Forcing thread termination")
+		else:
+			ai_thread.wait_to_finish()
 
 func _setup_menus() -> void:
 	# Difficulty
@@ -167,13 +186,24 @@ func _input(event: InputEvent) -> void:
 			_check_win_condition_after_move()
 
 func _process_ai() -> void:
+	# Check if we should stop
+	ai_mutex.lock()
+	if ai_should_stop:
+		ai_mutex.unlock()
+		return
+	ai_mutex.unlock()
+	
 	# Apply pending move
 	ai_mutex.lock()
-	if ai_move_pending != null:
-		var move = ai_move_pending
+	var has_pending_move = (ai_move_pending != null)
+	var move = ai_move_pending if has_pending_move else ""
+	if has_pending_move:
 		ai_move_pending = null
-		ai_mutex.unlock()
-		
+		is_ai_thinking = false
+	ai_mutex.unlock()
+	
+	if has_pending_move:
+		# Wait for thread to finish
 		if ai_thread.is_started():
 			ai_thread.wait_to_finish()
 			
@@ -184,27 +214,49 @@ func _process_ai() -> void:
 			_check_win_condition_after_move()
 		
 		last_ai_move_time = Time.get_ticks_msec() / 1000.0
-		is_ai_thinking = false
 		return
-	else:
-		ai_mutex.unlock()
-		
+	
 	# Start new think if needed
-	if is_ai_thinking: return
+	ai_mutex.lock()
+	var is_thinking = is_ai_thinking
+	ai_mutex.unlock()
+	
+	if is_thinking: return
 	if a_board.is_animating: return
 	
 	var time_now = Time.get_ticks_msec() / 1000.0
 	if time_now - last_ai_move_time >= ai_delay:
+		ai_mutex.lock()
 		is_ai_thinking = true
-		ai_thread.start(_ai_think_task.bind(game_a.current_board_state, ai_depth))
+		ai_mutex.unlock()
+		
+		# Start thread
+		if ai_thread.is_started():
+			ai_thread.wait_to_finish()
+		
+		var result = ai_thread.start(_ai_think_task.bind(game_a.current_board_state, ai_depth))
+		if result != OK:
+			push_error("Failed to start AI thread: " + str(result))
+			ai_mutex.lock()
+			is_ai_thinking = false
+			ai_mutex.unlock()
 
 
 func _ai_think_task(board_val: int, depth: int) -> void:
+	# Check if we should stop before starting expensive computation
+	ai_mutex.lock()
+	if ai_should_stop:
+		ai_mutex.unlock()
+		return
+	ai_mutex.unlock()
+	
 	# This runs on thread
 	var move = ai_player.choose_best_move(board_val, depth)
 	
+	# Store result
 	ai_mutex.lock()
-	ai_move_pending = move
+	if not ai_should_stop:  # Only set if not shutting down
+		ai_move_pending = move
 	ai_mutex.unlock()
 
 func _check_win_condition_after_move() -> void:

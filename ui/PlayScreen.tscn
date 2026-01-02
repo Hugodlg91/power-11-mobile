@@ -1,8 +1,8 @@
 [gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://ui/PlayScreen.gd" id="1_script"]
-[ext_resource type="PackedScene" path="res://ui/components/GameBoard.tscn" id="2_board"]
 [ext_resource type="PackedScene" path="res://ui/components/MenuButton.tscn" id="3_btn"]
+[ext_resource type="PackedScene" path="res://ui/components/GameBoard.tscn" id="4_board"]
 
 [node name="PlayScreen" type="Control"]
 layout_mode = 3
@@ -73,17 +73,17 @@ theme_override_font_sizes/font_size = 24
 text = "0"
 horizontal_alignment = 1
 
-[node name="BoardContainer" parent="." instance=ExtResource("2_board")]
+[node name="GameBoard" parent="." instance=ExtResource("4_board")]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -250.0
-offset_top = -200.0
-offset_right = 250.0
-offset_bottom = 300.0
+offset_left = -220.0
+offset_top = -170.0
+offset_right = 220.0
+offset_bottom = 270.0
 grow_horizontal = 2
 grow_vertical = 2
 

@@ -3,6 +3,7 @@ extends Control
 @onready var game_board: Control = $GameBoard
 @onready var score_label: Label = $ScoreBox/Value
 @onready var best_label: Label = $BestBox/Value
+@onready var back_button: Button = $BackButton
 
 var game: Game2048
 var ai_player: AIPlayer
@@ -20,11 +21,10 @@ func _ready() -> void:
 	
 	best_label.text = str(Settings.get_highscore())
 	
+	# Connect back button signal
+	back_button.pressed.connect(_on_back_pressed)
+	
 func _process(delta: float) -> void:
-	if $BackButton.button_pressed:
-		get_tree().change_scene_to_file("res://ui/MainMenu.tscn")
-		return
-		
 	if game_board.is_animating: return
 	if game.is_game_over(): return
 	

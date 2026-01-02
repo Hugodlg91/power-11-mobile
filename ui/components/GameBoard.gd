@@ -16,9 +16,6 @@ signal animation_finished
 
 func setup(p_size: float, p_margin: int) -> void:
 	# Calculate cell size based on container width/height (assumed square)
-	# Size is available from self.size or custom_minimum_size
-	# But actually we often set custom_minimum_size from outside.
-	# Let's trust custom_minimum_size.x
 	var side = p_size
 	margin = p_margin
 	cell_size = int((side - (5 * margin)) / 4)
@@ -29,7 +26,7 @@ func update_theme(p_theme: String) -> void:
 	theme_name = p_theme
 	var theme_colors = UIAssets.get_theme_colors(theme_name)
 	board_bg.color = theme_colors["bg"]
-	# Update existing tiles?
+	# Update existing tiles
 	for t in grid_tiles.values():
 		t.update_appearance(theme_name)
 	# Re-draw static slots
@@ -84,146 +81,250 @@ func create_tile(val: int, row: int, col: int, anim_spawn: bool) -> Control:
 	return t
 
 # ============================================================================
-# ANIMATION LOGIC (Refactored from PlayScreen)
+# ANIMATION LOGIC - REWRITTEN TO MATCH Python's animations.py EXACTLY
 # ============================================================================
-func animate_transition(_old_board: Array, new_board: Array, direction: String) -> void:
+func animate_transition(old_board: Array, new_board: Array, direction: String) -> void:
+	print("\n=== ANIMATE_TRANSITION START ===")
+	print("Direction: ", direction)
+	print("Old board: ", old_board)
+	print("New board: ", new_board)
+	print("grid_tiles size BEFORE: ", grid_tiles.size())
+	
 	is_animating = true
 	
-	var spawns_from_merge: Array = []
-	var spawns_random: Array = []
-	var moves: Array = [] 
+	var size = 4
+	var animations: Array = []  # Move/merge animations
+	var spawn_animations: Array = []  # Spawn animations
 	
-	# --- SIMULATION LOGIC (Same as PlayScreen) ---
-	# We process grid_tiles based on direction
+	# Track which tiles have been used (matching Python logic)
+	var old_tiles_used = {}
+	var new_tiles_used = {}
 	
-	# Helper to find tile at r,c
-	# (Already mostly correct in PlayScreen logic, just needing 'grid_tiles')
+	# Initialize tracking
+	for r in range(size):
+		for c in range(size):
+			old_tiles_used[Vector2i(r, c)] = false
+			new_tiles_used[Vector2i(r, c)] = false
 	
-	if direction == "left":
-		for r in range(4):
-			var new_col_cursor = 0
-			var last_val = -1
+	# Process based on direction (matching Python's logic exactly)
+	if direction in ["left", "right"]:
+		# Process row by row
+		for row in range(size):
+			# Get non-zero tile positions in order
+			var old_positions: Array = []
+			var new_positions: Array = []
 			
-			for c in range(4):
-				if not grid_tiles.has(Vector2i(r, c)): continue
-				var tile = grid_tiles[Vector2i(r, c)]
-				var val = tile.value
+			if direction == "left":
+				for c in range(size):
+					if old_board[row][c] != 0:
+						old_positions.append(Vector2i(row, c))
+					if new_board[row][c] != 0:
+						new_positions.append(Vector2i(row, c))
+			else:  # right
+				for c in range(size - 1, -1, -1):
+					if old_board[row][c] != 0:
+						old_positions.append(Vector2i(row, c))
+					if new_board[row][c] != 0:
+						new_positions.append(Vector2i(row, c))
+			
+			# Map old tiles to new tiles
+			var old_idx = 0
+			var new_idx = 0
+			
+			while new_idx < new_positions.size():
+				var new_pos = new_positions[new_idx]
+				var new_val = new_board[new_pos.x][new_pos.y]
+				new_tiles_used[new_pos] = true
 				
-				if last_val == val:
-					moves.append({ "node": tile, "tr": r, "tc": new_col_cursor - 1, "is_merge": true })
-					last_val = -1
-					spawns_from_merge.append({ "r": r, "c": new_col_cursor - 1, "val": val * 2 })
-				else:
-					last_val = val
-					moves.append({ "node": tile, "tr": r, "tc": new_col_cursor, "is_merge": false })
-					new_col_cursor += 1
+				if old_idx >= old_positions.size():
+					break
+				
+				var old_pos = old_positions[old_idx]
+				var old_val = old_board[old_pos.x][old_pos.y]
+				
+				# Check for merge
+				if old_idx + 1 < old_positions.size() and old_val * 2 == new_val:
+					var old_pos2 = old_positions[old_idx + 1]
+					var old_val2 = old_board[old_pos2.x][old_pos2.y]
 					
-	elif direction == "right":
-		for r in range(4):
-			var new_col_cursor = 3
-			var last_val = -1
-			
-			for c in range(3, -1, -1):
-				if not grid_tiles.has(Vector2i(r, c)): continue
-				var tile = grid_tiles[Vector2i(r, c)]
-				var val = tile.value
+					if old_val == old_val2:
+						# Merge animation - two tiles move to same position
+						animations.append({
+							"value": old_val,
+							"from_pos": old_pos,
+							"to_pos": new_pos,
+							"is_merge": true
+						})
+						animations.append({
+							"value": old_val2,
+							"from_pos": old_pos2,
+							"to_pos": new_pos,
+							"is_merge": true
+						})
+						old_tiles_used[old_pos] = true
+						old_tiles_used[old_pos2] = true
+						old_idx += 2
+						new_idx += 1
+						continue
 				
-				if last_val == val:
-					moves.append({ "node": tile, "tr": r, "tc": new_col_cursor + 1, "is_merge": true })
-					last_val = -1; spawns_from_merge.append({ "r": r, "c": new_col_cursor + 1, "val": val * 2 })
-				else:
-					last_val = val; moves.append({ "node": tile, "tr": r, "tc": new_col_cursor, "is_merge": false })
-					new_col_cursor -= 1
-					
-	elif direction == "up":
-		for c in range(4):
-			var new_row_cursor = 0
-			var last_val = -1
-			
-			for r in range(4):
-				if not grid_tiles.has(Vector2i(r, c)): continue
-				var tile = grid_tiles[Vector2i(r, c)]
-				var val = tile.value
-				
-				if last_val == val:
-					moves.append({ "node": tile, "tr": new_row_cursor - 1, "tc": c, "is_merge": true })
-					last_val = -1; spawns_from_merge.append({ "r": new_row_cursor - 1, "c": c, "val": val * 2 })
-				else:
-					last_val = val; moves.append({ "node": tile, "tr": new_row_cursor, "tc": c, "is_merge": false })
-					new_row_cursor += 1
-					
-	elif direction == "down":
-		for c in range(4):
-			var new_row_cursor = 3
-			var last_val = -1
-			
-			for r in range(3, -1, -1):
-				if not grid_tiles.has(Vector2i(r, c)): continue
-				var tile = grid_tiles[Vector2i(r, c)]
-				var val = tile.value
-				
-				if last_val == val:
-					moves.append({ "node": tile, "tr": new_row_cursor + 1, "tc": c, "is_merge": true })
-					last_val = -1; spawns_from_merge.append({ "r": new_row_cursor + 1, "c": c, "val": val * 2 })
-				else:
-					last_val = val; moves.append({ "node": tile, "tr": new_row_cursor, "tc": c, "is_merge": false })
-					new_row_cursor -= 1
-
-	grid_tiles.clear()
+				# Simple move
+				animations.append({
+					"value": old_val,
+					"from_pos": old_pos,
+					"to_pos": new_pos,
+					"is_merge": false
+				})
+				old_tiles_used[old_pos] = true
+				new_tiles_used[new_pos] = true
+				old_idx += 1
+				new_idx += 1
 	
-	# Random Spawns logic (Simplified: any non-zero in new_board not covered by move target)
-	# Actually, simpler: Any tile in new_board that wasn't a merge target is either a moved tile or random spawn.
-	# But we need to know WHICH one is random to trigger pop animation.
-	# The logic "Any slot not covered by a Move Destination (slide or merge) is Random" holds.
+	else:  # up or down
+		# Process column by column
+		for col in range(size):
+			# Get non-zero tile positions in order
+			var old_positions: Array = []
+			var new_positions: Array = []
+			
+			if direction == "up":
+				for r in range(size):
+					if old_board[r][col] != 0:
+						old_positions.append(Vector2i(r, col))
+					if new_board[r][col] != 0:
+						new_positions.append(Vector2i(r, col))
+			else:  # down
+				for r in range(size - 1, -1, -1):
+					if old_board[r][col] != 0:
+						old_positions.append(Vector2i(r, col))
+					if new_board[r][col] != 0:
+						new_positions.append(Vector2i(r, col))
+			
+			# Map old tiles to new tiles
+			var old_idx = 0
+			var new_idx = 0
+			
+			while new_idx < new_positions.size():
+				var new_pos = new_positions[new_idx]
+				var new_val = new_board[new_pos.x][new_pos.y]
+				new_tiles_used[new_pos] = true
+				
+				if old_idx >= old_positions.size():
+					break
+				
+				var old_pos = old_positions[old_idx]
+				var old_val = old_board[old_pos.x][old_pos.y]
+				
+				# Check for merge
+				if old_idx + 1 < old_positions.size() and old_val * 2 == new_val:
+					var old_pos2 = old_positions[old_idx + 1]
+					var old_val2 = old_board[old_pos2.x][old_pos2.y]
+					
+					if old_val == old_val2:
+						# Merge animation
+						animations.append({
+							"value": old_val,
+							"from_pos": old_pos,
+							"to_pos": new_pos,
+							"is_merge": true
+						})
+						animations.append({
+							"value": old_val2,
+							"from_pos": old_pos2,
+							"to_pos": new_pos,
+							"is_merge": true
+						})
+						old_tiles_used[old_pos] = true
+						old_tiles_used[old_pos2] = true
+						old_idx += 2
+						new_idx += 1
+						continue
+				
+				# Simple move
+				animations.append({
+					"value": old_val,
+					"from_pos": old_pos,
+					"to_pos": new_pos,
+					"is_merge": false
+				})
+				old_tiles_used[old_pos] = true
+				new_tiles_used[new_pos] = true
+				old_idx += 1
+				new_idx += 1
 	
-	var destinations = {}
-	for m in moves:
-		destinations[Vector2i(m.tr, m.tc)] = true
+	# Find spawned tiles (in new_board but not accounted for)
+	for r in range(size):
+		for c in range(size):
+			if new_board[r][c] != 0 and not new_tiles_used[Vector2i(r, c)]:
+				# This is a newly spawned tile
+				spawn_animations.append({
+					"value": new_board[r][c],
+					"pos": Vector2i(r, c)
+				})
+	
+	print("Animations count: ", animations.size())
+	print("Spawns count: ", spawn_animations.size())
+	for spawn in spawn_animations:
+		print("  Spawn: value=", spawn["value"], " pos=", spawn["pos"])
+	
+	# DON'T clear all tiles! Keep existing grid_tiles and update them
+	# Remove tiles from old positions and update animations
+	var tiles_to_remove = []
+	
+	for anim in animations:
+		var from_pos = anim["from_pos"]
+		var to_pos = anim["to_pos"]
+		var is_merge = anim["is_merge"]
 		
-	# Wait, if a merge happens at (0,0), destinations[(0,0)] is true.
-	# If a slide happens to (0,1), destinations[(0,1)] is true.
-	# The random spawn appears at an EMPTY spot.
-	# So if we animate everything correctly, the random spawn appears where no tile "landed".
-	
-	for r in range(4):
-		for c in range(4):
-			if new_board[r][c] != 0:
-				if not destinations.has(Vector2i(r, c)):
-					spawns_random.append({ "r": r, "c": c, "val": new_board[r][c] })
-
-	# Fire Tweens
-	for m in moves:
-		var tile = m.node
-		var target_pos = get_tile_pos(m.tc, m.tr)
-		tile.animate_move(target_pos, animation_duration)
-		
-		# If merge, destroy after
-		if m.is_merge:
-			get_tree().create_timer(animation_duration).timeout.connect(func(): tile.queue_free())
-		else:
-			# Check if this slide ends up dying inside a merge (the "first half" of merge logic)
-			var dies = false
-			for sm in spawns_from_merge:
-				if sm.r == m.tr and sm.c == m.tc:
-					dies = true; break
+		# Get the tile at the old position
+		if grid_tiles.has(from_pos):
+			var tile = grid_tiles[from_pos]
+			var target_px = get_tile_pos(to_pos.y, to_pos.x)
 			
-			if dies:
-				get_tree().create_timer(animation_duration).timeout.connect(func(): tile.queue_free())
+			# Animate the move
+			tile.animate_move(target_px, animation_duration)
+			
+			# Remove from grid_tiles at old position
+			grid_tiles.erase(from_pos)
+			
+			if is_merge:
+				# Mark for deletion after animation
+				tiles_to_remove.append(tile)
 			else:
-				# Keep it
-				tile.grid_pos = Vector2i(m.tr, m.tc)
-				grid_tiles[Vector2i(m.tr, m.tc)] = tile
-				
-	# Schedule Results
-	get_tree().create_timer(animation_duration).timeout.connect(func():
-		_finalize_turn(spawns_from_merge, spawns_random)
-	)
+				# Update grid position - tile stays at new position
+				tile.grid_pos = to_pos
+				grid_tiles[to_pos] = tile
+	
+	# Schedule cleanup and new tile creation
+	call_deferred("_finalize_animation", tiles_to_remove, animations, spawn_animations, new_board)
 
-func _finalize_turn(merges: Array, randoms: Array) -> void:
-	for m in merges:
-		create_tile(m.val, m.r, m.c, false).animate_merge()
-	for r in randoms:
-		create_tile(r.val, r.r, r.c, true)
-		
+func _finalize_animation(tiles_to_remove: Array, animations: Array, spawn_animations: Array, new_board: Array) -> void:
+	await get_tree().create_timer(animation_duration).timeout
+	
+	# Remove merged tiles
+	for tile in tiles_to_remove:
+		if is_instance_valid(tile):
+			tile.queue_free()
+	
+	# Create new merged tiles (find merge target positions)
+	var merge_targets = {}
+	for anim in animations:
+		if anim["is_merge"]:
+			var to_pos = anim["to_pos"]
+			if not merge_targets.has(to_pos):
+				merge_targets[to_pos] = new_board[to_pos.x][to_pos.y]
+	
+	# Create merged result tiles
+	for pos in merge_targets:
+		var value = merge_targets[pos]
+		if not grid_tiles.has(pos):  # Only if not already there
+			create_tile(value, pos.x, pos.y, false).animate_merge()
+	
+	# Create spawned tiles
+	for spawn_anim in spawn_animations:
+		var pos = spawn_anim["pos"]
+		var value = spawn_anim["value"]
+		if not grid_tiles.has(pos):  # Only if not already there
+			create_tile(value, pos.x, pos.y, true)
+	
 	is_animating = false
 	emit_signal("animation_finished")

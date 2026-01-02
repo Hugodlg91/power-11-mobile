@@ -71,12 +71,57 @@ func _start_listening(action: String, btn: Button) -> void:
 	btn.text = "..."
 	set_process_input(true)
 
+func _is_valid_key(keycode: int) -> bool:
+	# Reject modifier-only keys
+	if keycode in [KEY_SHIFT, KEY_CTRL, KEY_ALT, KEY_META]:
+		return false
+	# Reject system/special keys that shouldn't be rebound
+	if keycode in [KEY_ESCAPE, KEY_ENTER, KEY_TAB, KEY_BACKSPACE]:
+		return false
+	return true
+
+func _is_duplicate_key(key_str: String, current_action: String) -> bool:
+	var keys = Settings.get_setting("keys", {})
+	for action in keys:
+		if action != current_action and keys[action] == key_str:
+			return true
+	return false
+
 func _input(event: InputEvent) -> void:
 	if listening_action == "": return
 	
 	if event is InputEventKey and event.pressed:
 		var keycode = event.keycode
+		
+		# Allow ESC to cancel
+		if keycode == KEY_ESCAPE:
+			listening_action = ""
+			update_ui()
+			return
+		
+		# Validate key
+		if not _is_valid_key(keycode):
+			# Visual feedback for invalid key
+			var btn = _get_button_for_action(listening_action)
+			if btn:
+				btn.text = "INVALID"
+				await get_tree().create_timer(0.5).timeout
+				update_ui()
+			listening_action = ""
+			return
+		
 		var key_str = OS.get_keycode_string(keycode)
+		
+		# Check for duplicates
+		if _is_duplicate_key(key_str, listening_action):
+			# Visual feedback for duplicate
+			var btn = _get_button_for_action(listening_action)
+			if btn:
+				btn.text = "DUPLICATE"
+				await get_tree().create_timer(0.5).timeout
+				update_ui()
+			listening_action = ""
+			return
 		
 		var keys = Settings.get_setting("keys", {})
 		keys[listening_action] = key_str
@@ -85,6 +130,14 @@ func _input(event: InputEvent) -> void:
 		Settings.apply_settings() # Update InputMap
 		update_ui()
 		listening_action = ""
+
+func _get_button_for_action(action: String) -> Button:
+	match action:
+		"up": return key_up_btn
+		"down": return key_down_btn
+		"left": return key_left_btn
+		"right": return key_right_btn
+	return null
 
 func _on_music_vol_changed(val: float) -> void:
 	Settings.set_setting("music_volume", val)

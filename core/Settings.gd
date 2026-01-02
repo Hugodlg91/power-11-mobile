@@ -40,14 +40,30 @@ func load_settings() -> void:
 		var file = FileAccess.open(SETTINGS_FILE, FileAccess.READ)
 		if file:
 			var json = JSON.new()
-			var err = json.parse(file.get_as_text())
+			var text = file.get_as_text()
+			var err = json.parse(text)
+			
 			if err == OK:
 				var data = json.data
 				if data is Dictionary:
-					# Merge loaded data with defaults
+					# Merge loaded data with defaults, validating types
 					for k in data:
 						if current_settings.has(k):
-							current_settings[k] = data[k]
+							# Type checking
+							var expected_type = typeof(current_settings[k])
+							var actual_type = typeof(data[k])
+							
+							if expected_type == actual_type:
+								current_settings[k] = data[k]
+							else:
+								print("Settings: Type mismatch for key '%s', using default" % k)
+				else:
+					print("Settings: Loaded data is not a Dictionary, using defaults")
+			else:
+				print("Settings: JSON parse error at line %d: %s" % [json.get_error_line(), json.get_error_message()])
+				print("Settings: Using default settings")
+		else:
+			print("Settings: Failed to open file, using defaults")
 	
 	save_settings() # Ensure file exists/is updated with partial new defaults
 
@@ -76,23 +92,16 @@ func _apply_input_map() -> void:
 			var godot_action = actions[key_action]
 			var key_str = keys[key_action]
 			
-			# Clean old bindings (except arrows? or keep arrows as default+custom?)
-			# To strictly follow "Rebinding", we should replace or add.
-			# Let's Wipe and Add both Custom + Default Arrows? 
-			# Or just Add Custom to existing?
-			# User code seems to replace.
-			# Let's try to map the string to a KeyCode.
+			if not key_str or key_str == "":
+				continue  # Skip empty key bindings
 			
 			var keycode = OS.find_keycode_from_string(key_str)
 			if keycode != KEY_NONE:
-				# We add it as a secondary event or primary?
-				# Let's not clear default arrows, it's safer for UI navigation.
-				# We check if event exists.
-				
-				# Actually, let's just ensure WASD work if set.
-				# We loop through existing events, if keycode is there, fine.
-				# If not, add it.
-				
+				# Check if already bound
+				if not InputMap.has_action(godot_action):
+					print("Settings: Action '%s' does not exist in InputMap" % godot_action)
+					continue
+					
 				var events = InputMap.action_get_events(godot_action)
 				var found = false
 				for e in events:
@@ -104,6 +113,9 @@ func _apply_input_map() -> void:
 					var new_event = InputEventKey.new()
 					new_event.keycode = keycode
 					InputMap.action_add_event(godot_action, new_event)
+					print("Settings: Bound '%s' to action '%s'" % [key_str, godot_action])
+			else:
+				print("Settings: Invalid keycode for '%s': %s" % [key_action, key_str])
 
 
 # --- Getters / Setters ---
