@@ -20,11 +20,12 @@ extends RefCounted
 ## Bitwise operations work correctly on the full 64 bits.
 
 # Lookup tables (16-bit row -> result)
-# We use PackedInt32Array. 
-# Since row_val is 16-bit (0-65535), the array size is 65536.
-static var ROW_LEFT_TABLE: PackedInt32Array = PackedInt32Array()
-static var ROW_RIGHT_TABLE: PackedInt32Array = PackedInt32Array()
-static var SCORE_TABLE: PackedInt32Array = PackedInt32Array()
+# Lookup tables (16-bit row -> result)
+# We use generic Array to ensure 64-bit integers are handled correctly without 
+# implicit 32-bit truncation during shifts.
+static var ROW_LEFT_TABLE: Array = []
+static var ROW_RIGHT_TABLE: Array = []
+static var SCORE_TABLE: Array = []
 
 # Flag to ensure tables are initialized only once
 static var _tables_initialized: bool = false
@@ -39,11 +40,16 @@ static func __init_tables() -> void:
 	if _tables_initialized:
 		return
 	
-	# Resize arrays to 65536
+	# Resize arrays to 65536 and fill with 0
 	ROW_LEFT_TABLE.resize(65536)
 	ROW_RIGHT_TABLE.resize(65536)
 	SCORE_TABLE.resize(65536)
 	
+	ROW_LEFT_TABLE.fill(0)
+	ROW_RIGHT_TABLE.fill(0)
+	SCORE_TABLE.fill(0)
+	
+	# Pass 1: Compute ROW_LEFT_TABLE and SCORE_TABLE
 	for row_val in range(65536):
 		# Extract 4 tiles from the 16-bit row
 		var tiles: Array[int] = []
@@ -87,24 +93,24 @@ static func __init_tables() -> void:
 		for i in range(4):
 			var val: int = merged[i]
 			if val > 0:
-				# Fast way to get log2 of power of 2:
-				# In GDScript 4, we can use exact float log or bit tricks.
-				# Since val is 2^k, most_significant_bit_index works perfectly if we handle 0.
-				# (Or just loop since it's small, but specific log2 is better).
-				# This returns the exponents 1, 2, ... for 2, 4...
-				# nearest_po2_exponent returns exponent for power of 2.
 				var exponent: int = _get_exponent(val)
 				left_result |= (exponent << (4 * i))
 		
 		ROW_LEFT_TABLE[row_val] = left_result
 		SCORE_TABLE[row_val] = gained
-		
-		# Collapse RIGHT
-		# Reverse input tiles, map through left table, reverse back
+
+	# Pass 2: Compute ROW_RIGHT_TABLE (Depends on ROW_LEFT_TABLE)
+	for row_val in range(65536):
+		var tiles: Array[int] = []
+		for i in range(4):
+			tiles.append((row_val >> (4 * i)) & 0xF)
+			
+		# Reverse input tiles
 		var reversed_row_val: int = 0
 		for i in range(4):
 			reversed_row_val |= (tiles[3 - i] << (4 * i))
 		
+		# Safe to lookup now because ROW_LEFT_TABLE is fully populated
 		var right_result_reversed: int = ROW_LEFT_TABLE[reversed_row_val]
 		
 		# Un-reverse result
@@ -136,24 +142,19 @@ static func _get_exponent(val: int) -> int:
 # ============================================================================
 
 func _transpose(bb: int) -> int:
-	# Transpose the bitboard (swap rows and columns).
-	# a1 = bb & 0xF0F00F0FF0F00F0F
-	# In Godot, 0xF0F00F0FF0F00F0F is too large for signed 64-bit literal.
-	# We use the negative equivalent: -1085102592571150097
-	
-	var a1: int = bb & -1085102592571150097
-	var a2: int = bb & 0x0000F0F00000F0F0
-	var a3: int = bb & 0x0F0F00000F0F0000
-	
-	var a: int = a1 | (a2 << 12) | (a3 >> 12)
-	
-	# b1 = a & 0xFF00FF0000FF00FF
-	# Negative equivalent: -71777214294589697
-	var b1: int = a & -71777214294589697
-	var b2: int = a & 0x00FF00FF00000000
-	var b3: int = a & 0x00000000FF00FF00
-	
-	return b1 | (b2 >> 24) | (b3 << 24)
+	# Loop-based transposition (Safe and robust for Godot 64-bit int)
+	var result: int = 0
+	for r in range(4):
+		for c in range(4):
+			# Get nibble at (r, c)
+			var shift_src = 4 * (r * 4 + c)
+			var val = (bb >> shift_src) & 0xF
+			
+			if val != 0:
+				# Place at (c, r)
+				var shift_dst = 4 * (c * 4 + r)
+				result |= (val << shift_dst)
+	return result
 
 ## Returns [new_bitboard: int, score_gained: int]
 func move_left(bb: int) -> Array:
