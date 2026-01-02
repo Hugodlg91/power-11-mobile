@@ -58,6 +58,9 @@ func move(direction: String) -> bool:
 func get_board_array() -> Array:
 	return bitboard.bitboard_to_board(current_board_state)
 
+func get_board_array_copy() -> Array:
+	return get_board_array().duplicate(true)
+
 func is_game_over() -> bool:
 	return bitboard.is_game_over(current_board_state)
 

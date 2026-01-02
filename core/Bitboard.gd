@@ -93,8 +93,8 @@ static func __init_tables() -> void:
 				# (Or just loop since it's small, but specific log2 is better).
 				# This returns the exponents 1, 2, ... for 2, 4...
 				# nearest_po2_exponent returns exponent for power of 2.
-				var exp: int = _get_exponent(val)
-				left_result |= (exp << (4 * i))
+				var exponent: int = _get_exponent(val)
+				left_result |= (exponent << (4 * i))
 		
 		ROW_LEFT_TABLE[row_val] = left_result
 		SCORE_TABLE[row_val] = gained
@@ -125,11 +125,11 @@ static func _get_exponent(val: int) -> int:
 	# built-in log(val) / log(2) is float based.
 	# Bit scan reverse is cleaner.
 	# In pure GDScript loop is cheap for these small numbers.
-	var exp: int = 0
+	var exponent: int = 0
 	while val > 1:
 		val >>= 1
-		exp += 1
-	return exp
+		exponent += 1
+	return exponent
 
 # ============================================================================
 # BITBOARD MOVE OPERATIONS
@@ -242,8 +242,8 @@ func board_to_bitboard(board: Array) -> int:
 			var val: int = board[row][col]
 			if val > 0:
 				# log2 of val
-				var exp: int = _get_exponent(val)
-				bb |= (exp << (4 * (row * 4 + col)))
+				var exponent: int = _get_exponent(val)
+				bb |= (exponent << (4 * (row * 4 + col)))
 	return bb
 
 func bitboard_to_board(bb: int) -> Array:
@@ -252,9 +252,9 @@ func bitboard_to_board(bb: int) -> Array:
 		var row_arr: Array[int] = []
 		for col in range(4):
 			var shift: int = 4 * (row * 4 + col)
-			var exp: int = (bb >> shift) & 0xF
-			if exp > 0:
-				row_arr.append(1 << exp)
+			var exponent: int = (bb >> shift) & 0xF
+			if exponent > 0:
+				row_arr.append(1 << exponent)
 			else:
 				row_arr.append(0)
 		board.append(row_arr)
@@ -313,9 +313,9 @@ func is_game_over(bb: int) -> bool:
 func get_max_tile(bb: int) -> int:
 	var max_exp: int = 0
 	for pos in range(16):
-		var exp: int = (bb >> (4 * pos)) & 0xF
-		if exp > max_exp:
-			max_exp = exp
+		var exponent: int = (bb >> (4 * pos)) & 0xF
+		if exponent > max_exp:
+			max_exp = exponent
 	
 	if max_exp == 0:
 		return 0

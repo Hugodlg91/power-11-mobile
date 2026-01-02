@@ -1,0 +1,122 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://ui/MainMenu.gd" id="1_menu"]
+[ext_resource type="PackedScene" path="res://ui/components/MenuButton.tscn" id="2_btn"]
+
+[node name="MainMenu" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_menu")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.733333, 0.678431, 0.627451, 1)
+
+[node name="TitleGroup" type="Control" parent="."]
+layout_mode = 1
+anchor_top = 0.15
+anchor_right = 1.0
+anchor_bottom = 0.25
+grow_horizontal = 2
+
+[node name="Shadow" type="Label" parent="TitleGroup"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -196.0
+offset_top = -46.0
+offset_right = 204.0
+offset_bottom = 54.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 80
+text = "POWER 11"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="Main" type="Label" parent="TitleGroup"]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -50.0
+offset_right = 200.0
+offset_bottom = 50.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_colors/font_color = Color(1, 0.843137, 0, 1)
+theme_override_font_sizes/font_size = 80
+text = "POWER 11"
+horizontal_alignment = 1
+vertical_alignment = 1
+
+[node name="VBoxContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -100.0
+offset_right = 200.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="BtnPlay" parent="VBoxContainer" instance=ExtResource("2_btn")]
+layout_mode = 2
+text = "PLAY MANUAL"
+
+[node name="BtnVersus" parent="VBoxContainer" instance=ExtResource("2_btn")]
+layout_mode = 2
+text = "VERSUS AI"
+
+[node name="BtnSettings" parent="VBoxContainer" instance=ExtResource("2_btn")]
+layout_mode = 2
+text = "SETTINGS"
+
+[node name="BtnLeaderboard" parent="VBoxContainer" instance=ExtResource("2_btn")]
+layout_mode = 2
+text = "LEADERBOARD"
+bg_color = Color(0.196078, 0.196078, 0.196078, 1)
+text_color = Color(1, 0.843137, 0, 1)
+
+[node name="BtnQuit" parent="VBoxContainer" instance=ExtResource("2_btn")]
+layout_mode = 2
+text = "QUIT"
+bg_color = Color(0.705882, 0.196078, 0.196078, 1)
+
+[node name="Footer" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 7
+anchor_left = 0.5
+anchor_top = 1.0
+anchor_right = 0.5
+anchor_bottom = 1.0
+offset_left = -100.0
+offset_top = -40.0
+offset_right = 100.0
+grow_horizontal = 2
+grow_vertical = 0
+theme_override_colors/font_color = Color(0.392157, 0.392157, 0.392157, 1)
+text = "HELLO WORLD !"
+horizontal_alignment = 1

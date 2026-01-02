@@ -1,0 +1,239 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://ui/VersusScreen.gd" id="1_versus"]
+[ext_resource type="PackedScene" path="res://ui/components/GameBoard.tscn" id="2_board"]
+[ext_resource type="PackedScene" path="res://ui/components/MenuButton.tscn" id="3_btn"]
+
+[node name="VersusScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_versus")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.117647, 0.117647, 0.117647, 1)
+
+[node name="Header" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 40.0
+offset_right = 200.0
+offset_bottom = 100.0
+grow_horizontal = 2
+theme_override_colors/font_color = Color(1, 0.843137, 0, 1)
+theme_override_font_sizes/font_size = 48
+text = "VERSUS AI"
+horizontal_alignment = 1
+
+[node name="GameArea" type="HBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -420.0
+offset_top = -150.0
+offset_right = 420.0
+offset_bottom = 250.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 40
+alignment = 1
+
+[node name="LeftSide" type="VBoxContainer" parent="GameArea"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="GameArea/LeftSide"]
+layout_mode = 2
+text = "YOU"
+horizontal_alignment = 1
+
+[node name="Score" type="Label" parent="GameArea/LeftSide"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.196078, 0.803922, 0.196078, 1)
+text = "SCORE: 0"
+horizontal_alignment = 1
+
+[node name="Board" parent="GameArea/LeftSide" instance=ExtResource("2_board")]
+custom_minimum_size = Vector2(400, 400)
+layout_mode = 2
+
+[node name="RightSide" type="VBoxContainer" parent="GameArea"]
+layout_mode = 2
+alignment = 1
+
+[node name="Label" type="Label" parent="GameArea/RightSide"]
+layout_mode = 2
+text = "AI (MEDIUM)"
+horizontal_alignment = 1
+
+[node name="Score" type="Label" parent="GameArea/RightSide"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.803922, 0.196078, 0.196078, 1)
+text = "SCORE: 0"
+horizontal_alignment = 1
+
+[node name="Board" parent="GameArea/RightSide" instance=ExtResource("2_board")]
+custom_minimum_size = Vector2(400, 400)
+layout_mode = 2
+
+[node name="TimerLabel" type="Label" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -100.0
+offset_top = 120.0
+offset_right = 100.0
+offset_bottom = 160.0
+grow_horizontal = 2
+theme_override_font_sizes/font_size = 32
+text = "00:00"
+horizontal_alignment = 1
+
+[node name="MenuOverlay" type="ColorRect" parent="."]
+visible = true
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0, 0, 0, 0.862745)
+
+[node name="DifficultyMenu" type="VBoxContainer" parent="MenuOverlay"]
+visible = true
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Label" type="Label" parent="MenuOverlay/DifficultyMenu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "SELECT DIFFICULTY"
+horizontal_alignment = 1
+
+[node name="BtnEasy" parent="MenuOverlay/DifficultyMenu" instance=ExtResource("3_btn")]
+layout_mode = 2
+text = "EASY"
+
+[node name="BtnMedium" parent="MenuOverlay/DifficultyMenu" instance=ExtResource("3_btn")]
+layout_mode = 2
+text = "MEDIUM"
+
+[node name="BtnHard" parent="MenuOverlay/DifficultyMenu" instance=ExtResource("3_btn")]
+layout_mode = 2
+text = "HARD"
+
+[node name="BtnDemon" parent="MenuOverlay/DifficultyMenu" instance=ExtResource("3_btn")]
+layout_mode = 2
+text = "DEMON"
+
+[node name="ModeMenu" type="VBoxContainer" parent="MenuOverlay"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -200.0
+offset_top = -200.0
+offset_right = 200.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Label" type="Label" parent="MenuOverlay/ModeMenu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "SELECT MODE"
+horizontal_alignment = 1
+
+[node name="BtnRace" parent="MenuOverlay/ModeMenu" instance=ExtResource("3_btn")]
+layout_mode = 2
+text = "RACE TO 2048"
+
+[node name="BtnTime" parent="MenuOverlay/ModeMenu" instance=ExtResource("3_btn")]
+layout_mode = 2
+text = "TIME ATTACK (3m)"
+
+[node name="GameOverMenu" type="VBoxContainer" parent="MenuOverlay"]
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -300.0
+offset_top = -200.0
+offset_right = 300.0
+offset_bottom = 200.0
+grow_horizontal = 2
+grow_vertical = 2
+theme_override_constants/separation = 30
+alignment = 1
+
+[node name="WinLabel" type="Label" parent="MenuOverlay/GameOverMenu"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 48
+text = "YOU WIN!"
+horizontal_alignment = 1
+
+[node name="ReasonLabel" type="Label" parent="MenuOverlay/GameOverMenu"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.784314, 0.784314, 0.784314, 1)
+text = "Opponent Eliminated"
+horizontal_alignment = 1
+
+[node name="BtnAgain" parent="MenuOverlay/GameOverMenu" instance=ExtResource("3_btn")]
+layout_mode = 2
+text = "PLAY AGAIN"
+
+[node name="BtnQuit" parent="MenuOverlay/GameOverMenu" instance=ExtResource("3_btn")]
+layout_mode = 2
+text = "BACK TO MENU"
+bg_color = Color(0.784314, 0.196078, 0.196078, 1)
+
+[node name="BtnBack" parent="." instance=ExtResource("3_btn")]
+layout_mode = 0
+anchors_preset = 2
+anchor_top = 1.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = -120.0
+offset_right = 240.0
+offset_bottom = -40.0
+grow_horizontal = 1
+grow_vertical = 0
+text = "BACK"
+bg_color = Color(0.784314, 0.196078, 0.196078, 1)

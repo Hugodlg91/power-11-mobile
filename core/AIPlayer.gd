@@ -19,11 +19,11 @@ func _log2(v: int) -> float:
 	# But for float return to match Python math.log2:
 	# Iterate or use built-in.
 	# Fast way for power-of-2 integer:
-	var exp: int = 0
+	var exponent: int = 0
 	while v > 1:
 		v >>= 1
-		exp += 1
-	return float(exp)
+		exponent += 1
+	return float(exponent)
 
 # ============================================================================
 # HEURISTICS

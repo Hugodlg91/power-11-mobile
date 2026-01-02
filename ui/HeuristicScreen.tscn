@@ -1,0 +1,117 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://ui/HeuristicScreen.gd" id="1_heur"]
+[ext_resource type="PackedScene" path="res://ui/components/GameBoard.tscn" id="2_board"]
+
+[node name="HeuristicScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1_heur")
+
+[node name="BG" type="ColorRect" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.180392, 0.180392, 0.2, 1)
+
+[node name="Header" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 5
+anchor_left = 0.5
+anchor_right = 0.5
+offset_left = -200.0
+offset_top = 40.0
+offset_right = 200.0
+offset_bottom = 140.0
+grow_horizontal = 2
+alignment = 1
+
+[node name="Title" type="Label" parent="Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.843137, 0, 1)
+theme_override_font_sizes/font_size = 48
+text = "POWER 11"
+horizontal_alignment = 1
+
+[node name="Sub" type="Label" parent="Header"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.784314, 0.784314, 0.784314, 1)
+theme_override_font_sizes/font_size = 24
+text = "AI: HEURISTIC"
+horizontal_alignment = 1
+
+[node name="GameBoard" parent="." instance=ExtResource("2_board")]
+custom_minimum_size = Vector2(500, 500)
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -250.0
+offset_top = -200.0
+offset_right = 250.0
+offset_bottom = 300.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ScoreBox" type="VBoxContainer" parent="."]
+layout_mode = 0
+offset_left = 50.0
+offset_top = 150.0
+offset_right = 200.0
+offset_bottom = 250.0
+
+[node name="Label" type="Label" parent="ScoreBox"]
+layout_mode = 2
+text = "SCORE"
+horizontal_alignment = 1
+
+[node name="Value" type="Label" parent="ScoreBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "0"
+horizontal_alignment = 1
+
+[node name="BestBox" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -200.0
+offset_top = 150.0
+offset_right = -50.0
+offset_bottom = 250.0
+grow_horizontal = 0
+
+[node name="Label" type="Label" parent="BestBox"]
+layout_mode = 2
+text = "BEST"
+horizontal_alignment = 1
+
+[node name="Value" type="Label" parent="BestBox"]
+layout_mode = 2
+theme_override_font_sizes/font_size = 32
+text = "0"
+horizontal_alignment = 1
+
+[node name="BackButton" type="Button" parent="."]
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_right = 0.0
+anchor_bottom = 1.0
+offset_left = 40.0
+offset_top = -100.0
+offset_right = 190.0
+offset_bottom = -50.0
+grow_horizontal = 1
+grow_vertical = 0
+text = "BACK"
