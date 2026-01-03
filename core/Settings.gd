@@ -21,7 +21,7 @@ var default_settings = {
 	},
 	"highscore": 0,
 	"theme": "Classic",
-	"music_volume": 0.5,
+	"music_volume": 1.0,
 	"sfx_volume": 1.0,
 	"music_muted": false,
 	"sfx_muted": false

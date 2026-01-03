@@ -2,13 +2,13 @@ extends Control
 
 const TileScene = preload("res://ui/Tile.tscn")
 
-@onready var board_bg: ColorRect = $BoardBG
+@onready var board_bg: Panel = $BoardBG
 @onready var tile_layer: Control = $TileLayer
 
 var theme_name: String = "Classic"
 var cell_size: int = 100
 var margin: int = 15
-var animation_duration: float = 0.20
+var animation_duration: float = 0.15
 var is_animating: bool = false
 var grid_tiles: Dictionary = {} 
 
@@ -23,7 +23,7 @@ func setup(p_size: float, p_margin: int) -> void:
 func update_theme(p_theme: String) -> void:
 	theme_name = p_theme
 	var theme_colors = UIAssets.get_theme_colors(theme_name)
-	board_bg.color = theme_colors["bg"]
+	_apply_board_style(theme_colors["bg"])
 	for t in grid_tiles.values():
 		t.update_appearance(theme_name)
 	_draw_static_bg()
@@ -33,15 +33,25 @@ func _draw_static_bg() -> void:
 		c.queue_free()
 		
 	var theme_colors = UIAssets.get_theme_colors(theme_name)
-	board_bg.color = theme_colors["bg"]
+	_apply_board_style(theme_colors["bg"])
 	
 	for r in range(4):
 		for c in range(4):
-			var slot = ColorRect.new()
-			slot.color = theme_colors["empty"]
+			var slot = Panel.new()
+			var style = StyleBoxFlat.new()
+			style.bg_color = theme_colors["empty"]
+			style.set_corner_radius_all(8)
+			slot.add_theme_stylebox_override("panel", style)
+			
 			slot.size = Vector2(cell_size, cell_size)
 			slot.position = get_tile_pos(c, r)
 			board_bg.add_child(slot)
+
+func _apply_board_style(color: Color) -> void:
+	var style = StyleBoxFlat.new()
+	style.bg_color = color
+	style.set_corner_radius_all(8)
+	board_bg.add_theme_stylebox_override("panel", style)
 
 func get_tile_pos(col: int, row: int) -> Vector2:
 	return Vector2(
@@ -78,6 +88,7 @@ func create_tile(val: int, row: int, col: int, anim_spawn: bool) -> Control:
 func animate_transition(old_board: Array, new_board: Array, direction: String) -> void:
 	is_animating = true
 	
+	@warning_ignore("shadowed_variable_base_class")
 	var size = 4
 	var animations: Array = []
 	var spawn_animations: Array = []

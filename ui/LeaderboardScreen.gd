@@ -55,7 +55,7 @@ func _create_row(rank, p_name, score) -> void:
 	
 	# Rank
 	var lbl_rank = Label.new()
-	lbl_rank.text = "#" + str(rank)
+	lbl_rank.text = "#" + str(int(rank))
 	lbl_rank.custom_minimum_size = Vector2(80, 0)
 	lbl_rank.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	var c = Color(0.8, 0.8, 0.8)
@@ -73,7 +73,7 @@ func _create_row(rank, p_name, score) -> void:
 	
 	# Score
 	var lbl_score = Label.new()
-	lbl_score.text = str(score)
+	lbl_score.text = str(int(score))
 	lbl_score.custom_minimum_size = Vector2(150, 0)
 	lbl_score.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	lbl_score.modulate = c

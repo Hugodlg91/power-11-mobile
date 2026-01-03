@@ -1,7 +1,8 @@
-[gd_scene load_steps=3 format=3]
+[gd_scene load_steps=3 format=3 uid="uid://b05woqd6456w8"]
 
-[ext_resource type="Script" path="res://ui/MainMenu.gd" id="1_menu"]
+[ext_resource type="Script" uid="uid://ctqgbig7om1xu" path="res://ui/MainMenu.gd" id="1_menu"]
 [ext_resource type="PackedScene" path="res://ui/components/MenuButton.tscn" id="2_btn"]
+[ext_resource type="AudioStream" uid="uid://0gs641wpkvc4" path="res://assets/sounds/background.wav" id="3_bgm"]
 
 [node name="MainMenu" type="Control"]
 layout_mode = 3
@@ -84,7 +85,7 @@ alignment = 1
 
 [node name="BtnPlay" parent="VBoxContainer" instance=ExtResource("2_btn")]
 layout_mode = 2
-text = "PLAY MANUAL"
+text = "SOLO"
 
 [node name="BtnVersus" parent="VBoxContainer" instance=ExtResource("2_btn")]
 layout_mode = 2

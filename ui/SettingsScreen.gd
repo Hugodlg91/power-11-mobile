@@ -10,12 +10,25 @@ extends Control
 @onready var music_check: CheckBox = $Content/Audio/MusicRow/Mute
 @onready var sfx_slider: HSlider = $Content/Audio/SFXRow/Slider
 @onready var sfx_check: CheckBox = $Content/Audio/SFXRow/Mute
+@onready var device_opt: OptionButton = $Content/Audio/DeviceRow/OptionButton
 
 @onready var back_btn: Button = $BackButton
 
 var listening_action: String = ""
 
 func _ready() -> void:
+	# Populate Devices
+	device_opt.clear()
+	var devices = AudioServer.get_output_device_list()
+	var current_device = AudioServer.get_output_device()
+	
+	for i in range(devices.size()):
+		device_opt.add_item(devices[i])
+		if devices[i] == current_device:
+			device_opt.selected = i
+			
+	device_opt.item_selected.connect(_on_device_selected)
+	
 	update_ui()
 	
 	theme_btn.pressed.connect(_cycle_theme)
@@ -30,6 +43,12 @@ func _ready() -> void:
 	sfx_slider.value_changed.connect(_on_sfx_vol_changed)
 	music_check.toggled.connect(_on_music_mute_toggled)
 	sfx_check.toggled.connect(_on_sfx_mute_toggled)
+
+func _on_device_selected(index: int) -> void:
+	var device_name = device_opt.get_item_text(index)
+	AudioServer.set_output_device(device_name)
+	# Save this preference? Ideally yes, but for now runtime fix.
+	Settings.set_setting("audio_device", device_name)
 
 func update_ui() -> void:
 	# Theme

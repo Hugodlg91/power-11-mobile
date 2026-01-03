@@ -15,31 +15,46 @@ const SOUND_FILES = {
 const MUSIC_FILE = "res://assets/sounds/background.wav"
 
 func _ready() -> void:
-	# Create Music Player
-	music_player = AudioStreamPlayer.new()
-	music_player.bus = "Master" # Start simpler
-	add_child(music_player)
-	
-	# Load Music
+	# Load Music Asset
 	if FileAccess.file_exists(MUSIC_FILE):
 		var s = load(MUSIC_FILE)
 		if s and s is AudioStreamWAV:
+			# Force parameters on the resource
 			s.loop_mode = AudioStreamWAV.LOOP_FORWARD
-			music_player.stream = s
-			music_player.play()
-			print("SoundManager: Music loaded and playing")
-		elif s:
-			print("SoundManager: Music file loaded but wrong format (expected AudioStreamWAV)")
+			_start_music_player(s)
 		else:
-			print("SoundManager: Failed to load music file: " + MUSIC_FILE)
+			print("SoundManager: invalid music file")
 	else:
-		print("SoundManager: Music file not found: " + MUSIC_FILE)
-	
+		print("SoundManager: music file missing")
+
 	# Connect to Settings
 	Settings.connect("volume_changed", _on_volume_changed)
 	
-	# Initial Volume Apply
-	_on_volume_changed()
+func _start_music_player(stream: AudioStream) -> void:
+	if music_player:
+		music_player.queue_free()
+		
+	music_player = AudioStreamPlayer.new()
+	music_player.name = "MusicPlayer"
+	# music_player.bus = "Master" # Start simpler - Default is Master
+	music_player.stream = stream
+	add_child(music_player)
+	
+	# Fail-safe loop
+	music_player.finished.connect(func(): 
+		print("SoundManager: Loop restart")
+		music_player.play()
+	)
+	
+	# FORCE VOLUME FOR DEBUG - Bypass Settings
+	music_player.volume_db = 0.0 
+	
+	music_player.play()
+	print("SoundManager: Music started. Forced 0dB. Stream: ", stream.resource_path)
+
+func _update_music_volume() -> void:
+	# Disabled for debug
+	pass
 
 func play(sfx_name: String) -> void:
 	if Settings.get_setting("sfx_muted", false):
@@ -67,14 +82,7 @@ func play(sfx_name: String) -> void:
 	p.play()
 
 func _on_volume_changed() -> void:
-	# Music
-	var m_muted = Settings.get_setting("music_muted", false)
-	var m_vol = Settings.get_setting("music_volume", 0.1)
+	_update_music_volume()
 	
-	if m_muted:
-		music_player.volume_db = -80.0
-	else:
-		music_player.volume_db = linear_to_db(m_vol)
-	
-	if not music_player.playing and not m_muted and music_player.stream:
+	if music_player and not music_player.playing and not Settings.get_setting("music_muted", false):
 		music_player.play()
