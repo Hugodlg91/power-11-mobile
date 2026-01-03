@@ -30,6 +30,7 @@ var ai_depth: int = 2
 var game_mode: String = "RACE"
 var time_limit: int = 180 # 3 mins
 var remaining_time: float = 0.0
+var touch_start: Vector2 = Vector2.ZERO
 
 # THREADING
 var ai_thread: Thread
@@ -181,6 +182,18 @@ func _input(event: InputEvent) -> void:
 	elif event.is_action_pressed("ui_right"): dir = "right"
 	elif event.is_action_pressed("ui_up"): dir = "up"
 	elif event.is_action_pressed("ui_down"): dir = "down"
+	
+	# Touch Swipe Logic
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			touch_start = event.position
+		else:
+			var drag = event.position - touch_start
+			if drag.length() > 50:
+				if abs(drag.x) > abs(drag.y):
+					dir = "right" if drag.x > 0 else "left"
+				else:
+					dir = "down" if drag.y > 0 else "up"
 	
 	if dir != "":
 		var old = game_p.get_board_array_copy()

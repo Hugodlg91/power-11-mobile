@@ -88,6 +88,5 @@ static func get_tile_text_color(value: int, theme_name: String = "Classic") -> C
 	if theme_name == "Classic":
 		return Color8(119, 110, 101) # text_dark for all
 	elif theme_name == "Cyberpunk":
-	elif theme_name == "Cyberpunk":
 		return Color.WHITE
 	return Color.WHITE

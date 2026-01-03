@@ -26,6 +26,7 @@ var leaderboard_mgr: LeaderboardManager
 var game: Game2048
 var ai_player: AIPlayer # For debug
 var old_board_state: Array = [] # For animation - saved BEFORE move
+var touch_start: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
 	game = Game2048.new()
@@ -87,6 +88,18 @@ func _input(event: InputEvent) -> void:
 	elif event.is_action_pressed("ui_right"): direction = "right"
 	elif event.is_action_pressed("ui_up"): direction = "up"
 	elif event.is_action_pressed("ui_down"): direction = "down"
+	
+	# Touch Swipe Logic
+	if event is InputEventScreenTouch:
+		if event.pressed:
+			touch_start = event.position
+		else:
+			var drag = event.position - touch_start
+			if drag.length() > 50:
+				if abs(drag.x) > abs(drag.y):
+					direction = "right" if drag.x > 0 else "left"
+				else:
+					direction = "down" if drag.y > 0 else "up"
 	
 	# Manual Reset
 	if event is InputEventKey and event.pressed and event.keycode == KEY_R:
