@@ -39,54 +39,59 @@ theme_override_colors/font_color = Color(0.6, 0.4, 0.2, 1)
 theme_override_font_sizes/font_size = 56
 text = "POWER 11"
 
-[node name="ScoreContainer" type="VBoxContainer" parent="."]
+[node name="ScoreContainer" type="HBoxContainer" parent="."]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = 50.0
+offset_left = -150.0
 offset_top = -450.0
 offset_right = 350.0
-offset_bottom = -310.0
+offset_bottom = -350.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 40
 alignment = 2
 
-[node name="ScoreBox" type="VBoxContainer" parent="ScoreContainer"]
+[node name="ScoreBox" type="HBoxContainer" parent="ScoreContainer"]
 layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 2
 
 [node name="Label" type="Label" parent="ScoreContainer/ScoreBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.2, 0.2, 0.2, 1)
 theme_override_font_sizes/font_size = 24
 text = "SCORE"
-horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="Value" type="Label" parent="ScoreContainer/ScoreBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
-theme_override_font_sizes/font_size = 64
+theme_override_font_sizes/font_size = 48
 text = "0"
-horizontal_alignment = 2
+vertical_alignment = 1
 
-[node name="BestBox" type="VBoxContainer" parent="ScoreContainer"]
+[node name="BestBox" type="HBoxContainer" parent="ScoreContainer"]
 layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 2
 
 [node name="Label" type="Label" parent="ScoreContainer/BestBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
-theme_override_font_sizes/font_size = 16
+theme_override_font_sizes/font_size = 24
 text = "BEST"
-horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="Value" type="Label" parent="ScoreContainer/BestBox"]
 layout_mode = 2
 theme_override_colors/font_color = Color(0.3, 0.3, 0.3, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_font_sizes/font_size = 48
 text = "0"
-horizontal_alignment = 2
+vertical_alignment = 1
 
 [node name="GameBoard" parent="." instance=ExtResource("4_board")]
 layout_mode = 1

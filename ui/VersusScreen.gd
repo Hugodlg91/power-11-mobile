@@ -129,7 +129,7 @@ func _start_game() -> void:
 	if game_mode == "TIME":
 		time_limit = 60
 		remaining_time = time_limit
-		timer_label.text = "%02d:%02d" % [time_limit / 60, time_limit % 60]
+		timer_label.text = "%02d:%02d" % [int(time_limit / 60.0), time_limit % 60]
 	else:
 		timer_label.text = "RACE TO 2048"
 		
@@ -159,7 +159,7 @@ func _process(delta: float) -> void:
 			remaining_time = 0
 			_resolve_time_attack()
 		
-		var m = int(remaining_time) / 60
+		var m = int(remaining_time / 60.0)
 		var s = int(remaining_time) % 60
 		timer_label.text = "%02d:%02d" % [m, s]
 		if remaining_time < 10:

@@ -33,7 +33,7 @@ func _ready() -> void:
 	if OS.has_feature("mobile"): # Force portrait on mobile
 		var os_name = OS.get_name()
 		if os_name == "Android" or os_name == "iOS":
-			DisplayServer.screen_set_orientation(1) # 1 = PORTRAIT
+			DisplayServer.screen_set_orientation(DisplayServer.SCREEN_PORTRAIT) # 1 = PORTRAIT
 	
 	load_settings()
 	apply_settings()

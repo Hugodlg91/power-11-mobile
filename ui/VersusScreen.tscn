@@ -183,7 +183,7 @@ text = "RACE TO 2048"
 
 [node name="BtnTime" parent="MenuOverlay/ModeMenu" instance=ExtResource("3_btn")]
 layout_mode = 2
-text = "TIME ATTACK (3m)"
+text = "TIME ATTACK"
 
 [node name="GameOverMenu" type="VBoxContainer" parent="MenuOverlay"]
 visible = false

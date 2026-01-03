@@ -6,8 +6,8 @@ extends Control
 @onready var key_left_btn: Button = $Content/Keys/RowLeft/Button
 @onready var key_right_btn: Button = $Content/Keys/RowRight/Button
 
-@onready var sfx_slider: HSlider = $Content/Audio/SFXRow/Slider
-@onready var sfx_check: CheckBox = $Content/Audio/SFXRow/Mute
+@onready var sfx_slider: HSlider = $Content/Audio/SFXRow/SliderWrapper/Slider
+@onready var sfx_check: CheckBox = $Content/Audio/SFXRow/MuteWrapper/Mute
 
 @onready var back_btn: Button = $BackButton
 @onready var bg: ColorRect = $BG
@@ -17,6 +17,13 @@ var listening_action: String = ""
 func _ready() -> void:
 	# Update background to match current theme
 	_update_background()
+	
+	# Debug prints for layout verification
+	var win_size = DisplayServer.window_get_size()
+	print("SettingsScreen Debug: Window Size: ", win_size)
+	print("SettingsScreen Debug: Safe Area: ", DisplayServer.get_display_safe_area())
+	if win_size.x < 600:
+		push_warning("SettingsScreen: Screen width < 600px, Slider might be clipped!")
 	
 	# Connect to theme changes
 	Settings.connect("theme_changed", _on_theme_changed)

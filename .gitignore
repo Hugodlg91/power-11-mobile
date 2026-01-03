@@ -26,3 +26,6 @@ Thumbs.db
 
 # Exclude Tests from Repo
 tests/
+
+# Documentation
+docs/

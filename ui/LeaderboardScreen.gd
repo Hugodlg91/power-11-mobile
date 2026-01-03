@@ -61,9 +61,14 @@ func _create_row(rank, p_name, score) -> void:
 	# Rank
 	var lbl_rank = Label.new()
 	lbl_rank.text = "#" + str(int(rank))
-	lbl_rank.custom_minimum_size = Vector2(80, 0)
-	lbl_rank.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
+	lbl_rank.add_theme_font_size_override("font_size", 32)
+	lbl_rank.custom_minimum_size = Vector2(100, 0)
 	var c = Color(0.8, 0.8, 0.8)
+	# Fix for Classic theme visibility
+	if Settings.get_theme_name() == "Classic":
+		c = Color("776e65") # Dark text color for Classic
+
+	lbl_rank.horizontal_alignment = HORIZONTAL_ALIGNMENT_RIGHT
 	if int(rank) == 1: c = Color(1, 0.84, 0) # Gold
 	elif int(rank) == 2: c = Color(0.75, 0.75, 0.75) # Silver
 	elif int(rank) == 3: c = Color(0.8, 0.5, 0.2) # Bronze
@@ -72,14 +77,16 @@ func _create_row(rank, p_name, score) -> void:
 	# Name
 	var lbl_name = Label.new()
 	lbl_name.text = str(p_name).substr(0, 12)
-	lbl_name.custom_minimum_size = Vector2(250, 0)
+	lbl_name.add_theme_font_size_override("font_size", 32)
+	lbl_name.custom_minimum_size = Vector2(400, 0)
 	lbl_name.horizontal_alignment = HORIZONTAL_ALIGNMENT_CENTER
 	lbl_name.modulate = c
 	
 	# Score
 	var lbl_score = Label.new()
 	lbl_score.text = str(int(score))
-	lbl_score.custom_minimum_size = Vector2(150, 0)
+	lbl_score.add_theme_font_size_override("font_size", 32)
+	lbl_score.custom_minimum_size = Vector2(200, 0)
 	lbl_score.horizontal_alignment = HORIZONTAL_ALIGNMENT_LEFT
 	lbl_score.modulate = c
 	
