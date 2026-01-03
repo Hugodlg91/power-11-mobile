@@ -3,10 +3,15 @@ extends Control
 @onready var content_box: VBoxContainer = $ScrollContainer/Content
 @onready var msg_label: Label = $MessageLabel
 @onready var back_btn: Button = $BackButton
+@onready var bg: ColorRect = $BG
 
 var db_manager: LeaderboardManager
 
 func _ready() -> void:
+	# Update background to match current theme
+	_update_background()
+	Settings.connect("theme_changed", _on_theme_changed)
+	
 	back_btn.pressed.connect(_on_back)
 	
 	# Clean placeholder
@@ -95,6 +100,13 @@ func _create_row(rank, p_name, score) -> void:
 	hbox.add_child(lbl_score)
 	
 	content_box.add_child(hbox)
+
+func _on_theme_changed(_new_theme: String) -> void:
+	_update_background()
+
+func _update_background() -> void:
+	var theme_colors = UIAssets.get_theme_colors(Settings.get_theme_name())
+	bg.color = theme_colors["bg"]
 
 func _on_back() -> void:
 	get_tree().change_scene_to_file("res://ui/MainMenu.tscn")

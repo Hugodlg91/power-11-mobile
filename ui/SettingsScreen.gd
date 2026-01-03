@@ -6,28 +6,20 @@ extends Control
 @onready var key_left_btn: Button = $Content/Keys/RowLeft/Button
 @onready var key_right_btn: Button = $Content/Keys/RowRight/Button
 
-@onready var music_slider: HSlider = $Content/Audio/MusicRow/Slider
-@onready var music_check: CheckBox = $Content/Audio/MusicRow/Mute
 @onready var sfx_slider: HSlider = $Content/Audio/SFXRow/Slider
 @onready var sfx_check: CheckBox = $Content/Audio/SFXRow/Mute
-@onready var device_opt: OptionButton = $Content/Audio/DeviceRow/OptionButton
 
 @onready var back_btn: Button = $BackButton
+@onready var bg: ColorRect = $BG
 
 var listening_action: String = ""
 
 func _ready() -> void:
-	# Populate Devices
-	device_opt.clear()
-	var devices = AudioServer.get_output_device_list()
-	var current_device = AudioServer.get_output_device()
+	# Update background to match current theme
+	_update_background()
 	
-	for i in range(devices.size()):
-		device_opt.add_item(devices[i])
-		if devices[i] == current_device:
-			device_opt.selected = i
-			
-	device_opt.item_selected.connect(_on_device_selected)
+	# Connect to theme changes
+	Settings.connect("theme_changed", _on_theme_changed)
 	
 	update_ui()
 	
@@ -39,16 +31,15 @@ func _ready() -> void:
 	key_left_btn.pressed.connect(func(): _start_listening("left", key_left_btn))
 	key_right_btn.pressed.connect(func(): _start_listening("right", key_right_btn))
 	
-	music_slider.value_changed.connect(_on_music_vol_changed)
 	sfx_slider.value_changed.connect(_on_sfx_vol_changed)
-	music_check.toggled.connect(_on_music_mute_toggled)
 	sfx_check.toggled.connect(_on_sfx_mute_toggled)
 
-func _on_device_selected(index: int) -> void:
-	var device_name = device_opt.get_item_text(index)
-	AudioServer.set_output_device(device_name)
-	# Save this preference? Ideally yes, but for now runtime fix.
-	Settings.set_setting("audio_device", device_name)
+func _on_theme_changed(_new_theme: String) -> void:
+	_update_background()
+
+func _update_background() -> void:
+	var theme_colors = UIAssets.get_theme_colors(Settings.get_theme_name())
+	bg.color = theme_colors["bg"]
 
 func update_ui() -> void:
 	# Theme
@@ -63,9 +54,7 @@ func update_ui() -> void:
 	key_right_btn.text = keys.get("right", "D").to_upper()
 	
 	# Audio
-	music_slider.value = Settings.get_setting("music_volume", 0.1)
 	sfx_slider.value = Settings.get_setting("sfx_volume", 1.0)
-	music_check.button_pressed = Settings.get_setting("music_muted", false)
 	sfx_check.button_pressed = Settings.get_setting("sfx_muted", false)
 
 func _cycle_theme() -> void:
@@ -79,11 +68,6 @@ func _cycle_theme() -> void:
 	
 	Settings.set_setting("theme", new_theme) 
 	theme_btn.text = "THEME: " + new_theme.to_upper()
-	# Apply visually immediately? PlayScreen handles it on ready/process. 
-	# Settings logic emits signal, UIAssets updates? 
-	# Actually UIAssets is static helper.
-	# We might need to reload specific nodes if we want immediate feedback here, 
-	# but this screen is just settings. The signal is enough for other screens.
 	
 func _start_listening(action: String, btn: Button) -> void:
 	listening_action = action
@@ -158,14 +142,8 @@ func _get_button_for_action(action: String) -> Button:
 		"right": return key_right_btn
 	return null
 
-func _on_music_vol_changed(val: float) -> void:
-	Settings.set_setting("music_volume", val)
-
 func _on_sfx_vol_changed(val: float) -> void:
 	Settings.set_setting("sfx_volume", val)
-
-func _on_music_mute_toggled(toggled: bool) -> void:
-	Settings.set_setting("music_muted", toggled)
 
 func _on_sfx_mute_toggled(toggled: bool) -> void:
 	Settings.set_setting("sfx_muted", toggled)

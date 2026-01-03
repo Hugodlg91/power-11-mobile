@@ -35,9 +35,9 @@ grow_horizontal = 2
 [node name="Title" type="Label" parent="Header"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(0.466667, 0.431373, 0.396078, 1)
+theme_override_colors/font_color = Color(1, 0.843137, 0, 1)
 theme_override_font_sizes/font_size = 64
-text = "2048"
+text = "POWER 11"
 
 [node name="ScoreBox" type="VBoxContainer" parent="Header"]
 custom_minimum_size = Vector2(100, 0)
@@ -80,10 +80,10 @@ anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -220.0
-offset_top = -170.0
-offset_right = 220.0
-offset_bottom = 270.0
+offset_left = -200.0
+offset_top = -150.0
+offset_right = 200.0
+offset_bottom = 250.0
 grow_horizontal = 2
 grow_vertical = 2
 
@@ -95,38 +95,71 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-color = Color(0, 0, 0, 0.682353)
+color = Color(0, 0, 0, 0.85)
 
-[node name="Label" type="Label" parent="GameOverOverlay"]
+[node name="Content" type="VBoxContainer" parent="GameOverOverlay"]
 layout_mode = 1
 anchors_preset = 8
 anchor_left = 0.5
 anchor_top = 0.5
 anchor_right = 0.5
 anchor_bottom = 0.5
-offset_left = -163.0
-offset_top = -34.0
-offset_right = 163.0
-offset_bottom = 34.0
+offset_left = -150.0
+offset_top = -150.0
+offset_right = 150.0
+offset_bottom = 150.0
 grow_horizontal = 2
 grow_vertical = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="Title" type="Label" parent="GameOverOverlay/Content"]
+layout_mode = 2
 theme_override_colors/font_color = Color(1, 1, 1, 1)
 theme_override_font_sizes/font_size = 48
 text = "GAME OVER"
+horizontal_alignment = 1
 
-[node name="Label2" type="Label" parent="GameOverOverlay"]
-layout_mode = 1
-anchors_preset = 8
-anchor_left = 0.5
-anchor_top = 0.5
-anchor_right = 0.5
-anchor_bottom = 0.5
-offset_left = -84.0
-offset_top = 37.0
-offset_right = 84.0
-offset_bottom = 60.0
-grow_horizontal = 2
-grow_vertical = 2
+[node name="FinalScore" type="Label" parent="GameOverOverlay/Content"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.8, 0.8, 0.8, 1)
+theme_override_font_sizes/font_size = 24
+text = "Score: 0"
+horizontal_alignment = 1
+
+[node name="InputContainer" type="VBoxContainer" parent="GameOverOverlay/Content"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="NameInput" type="LineEdit" parent="GameOverOverlay/Content/InputContainer"]
+custom_minimum_size = Vector2(0, 40)
+layout_mode = 2
+placeholder_text = "ENTER NAME"
+alignment = 1
+max_length = 12
+
+[node name="SubmitBtn" parent="GameOverOverlay/Content/InputContainer" instance=ExtResource("3_btn")]
+layout_mode = 2
+text = "SUBMIT SCORE"
+
+[node name="StatusLabel" type="Label" parent="GameOverOverlay/Content/InputContainer"]
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 1, 0, 1)
+theme_override_font_sizes/font_size = 14
+horizontal_alignment = 1
+
+[node name="NavButtons" type="HBoxContainer" parent="GameOverOverlay/Content"]
+layout_mode = 2
+theme_override_constants/separation = 20
+alignment = 1
+
+[node name="BtnRestart" parent="GameOverOverlay/Content/NavButtons" instance=ExtResource("3_btn")]
+layout_mode = 2
+text = "TRY AGAIN"
+
+[node name="BtnMenu" parent="GameOverOverlay/Content/NavButtons" instance=ExtResource("3_btn")]
+layout_mode = 2
+text = "MENU"
 
 [node name="BtnBack" parent="." instance=ExtResource("3_btn")]
 layout_mode = 1

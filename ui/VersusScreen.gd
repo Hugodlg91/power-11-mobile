@@ -14,6 +14,7 @@ extends Control
 @onready var game_over_menu: Control = $MenuOverlay/GameOverMenu
 @onready var win_label: Label = $MenuOverlay/GameOverMenu/WinLabel
 @onready var reason_label: Label = $MenuOverlay/GameOverMenu/ReasonLabel
+@onready var bg: ColorRect = $BG
 
 # GAMES
 var game_p: Game2048
@@ -39,14 +40,18 @@ var ai_should_stop: bool = false  # Shutdown signal
 var last_ai_move_time: float = 0.0
 
 func _ready() -> void:
+	# Update background to match current theme
+	_update_background()
+	Settings.connect("theme_changed", _on_theme_changed)
+	
 	game_p = Game2048.new()
 	game_a = Game2048.new()
 	ai_player = AIPlayer.new()
 	
 	p_board.setup(400, 10)
 	a_board.setup(400, 10)
-	p_board.update_theme("Classic") # Force classic for now or Settings.get_theme()
-	a_board.update_theme("Classic")
+	p_board.update_theme(Settings.get_theme_name())
+	a_board.update_theme(Settings.get_theme_name())
 	
 	_setup_menus()
 	_show_menu(diff_menu)
@@ -121,7 +126,7 @@ func _start_game() -> void:
 	current_state = State.PLAYING
 	
 	if game_mode == "TIME":
-		time_limit = 180
+		time_limit = 60
 		remaining_time = time_limit
 		timer_label.text = "%02d:%02d" % [time_limit / 60, time_limit % 60]
 	else:
@@ -304,3 +309,24 @@ func _end_game(winner: String, reason: String) -> void:
 		win_label.modulate = Color.YELLOW
 		
 	reason_label.text = reason
+
+func _on_theme_changed(new_theme: String) -> void:
+	_update_background()
+	p_board.update_theme(new_theme)
+	a_board.update_theme(new_theme)
+
+func _update_background() -> void:
+	var theme_name = Settings.get_theme_name()
+	var theme_colors = UIAssets.get_theme_colors(theme_name)
+	bg.color = theme_colors["bg"]
+	
+	var txt_color = theme_colors["text_dark"]
+	if theme_name in ["Dark", "Cyberpunk"]:
+		txt_color = theme_colors["text_light"]
+		if theme_name == "Cyberpunk": txt_color = Color.WHITE
+		
+	# Update Labels
+	p_score.add_theme_color_override("font_color", txt_color)
+	a_score.add_theme_color_override("font_color", txt_color)
+	ai_label.add_theme_color_override("font_color", txt_color)
+	timer_label.add_theme_color_override("font_color", txt_color)

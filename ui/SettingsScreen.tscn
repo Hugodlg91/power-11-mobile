@@ -72,7 +72,6 @@ text = "UP"
 horizontal_alignment = 2
 
 [node name="Button" parent="Content/Keys/RowUp" instance=ExtResource("2_btn")]
-custom_minimum_size = Vector2(80, 50)
 layout_mode = 2
 text = "W"
 bg_color = Color(0.196078, 0.196078, 0.196078, 1)
@@ -89,7 +88,6 @@ text = "DOWN"
 horizontal_alignment = 2
 
 [node name="Button" parent="Content/Keys/RowDown" instance=ExtResource("2_btn")]
-custom_minimum_size = Vector2(80, 50)
 layout_mode = 2
 text = "S"
 bg_color = Color(0.196078, 0.196078, 0.196078, 1)
@@ -106,7 +104,6 @@ text = "LEFT"
 horizontal_alignment = 2
 
 [node name="Button" parent="Content/Keys/RowLeft" instance=ExtResource("2_btn")]
-custom_minimum_size = Vector2(80, 50)
 layout_mode = 2
 text = "A"
 bg_color = Color(0.196078, 0.196078, 0.196078, 1)
@@ -123,7 +120,6 @@ text = "RIGHT"
 horizontal_alignment = 2
 
 [node name="Button" parent="Content/Keys/RowRight" instance=ExtResource("2_btn")]
-custom_minimum_size = Vector2(80, 50)
 layout_mode = 2
 text = "D"
 bg_color = Color(0.196078, 0.196078, 0.196078, 1)
@@ -131,27 +127,6 @@ bg_color = Color(0.196078, 0.196078, 0.196078, 1)
 [node name="Audio" type="VBoxContainer" parent="Content"]
 layout_mode = 2
 theme_override_constants/separation = 20
-
-[node name="MusicRow" type="HBoxContainer" parent="Content/Audio"]
-layout_mode = 2
-alignment = 1
-
-[node name="Label" type="Label" parent="Content/Audio/MusicRow"]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-text = "MUSIC"
-horizontal_alignment = 2
-
-[node name="Slider" type="HSlider" parent="Content/Audio/MusicRow"]
-custom_minimum_size = Vector2(200, 30)
-layout_mode = 2
-max_value = 1.0
-step = 0.05
-value = 0.1
-
-[node name="Mute" type="CheckBox" parent="Content/Audio/MusicRow"]
-layout_mode = 2
-text = "Mute"
 
 [node name="SFXRow" type="HBoxContainer" parent="Content/Audio"]
 layout_mode = 2
@@ -173,20 +148,9 @@ value = 1.0
 [node name="Mute" type="CheckBox" parent="Content/Audio/SFXRow"]
 layout_mode = 2
 text = "Mute"
-
-[node name="DeviceRow" type="HBoxContainer" parent="Content/Audio"]
-layout_mode = 2
-alignment = 1
-
-[node name="Label" type="Label" parent="Content/Audio/DeviceRow"]
-custom_minimum_size = Vector2(100, 0)
-layout_mode = 2
-text = "DEVICE"
 horizontal_alignment = 2
 
-[node name="OptionButton" type="OptionButton" parent="Content/Audio/DeviceRow"]
-custom_minimum_size = Vector2(250, 30)
-layout_mode = 2
+
 
 [node name="BackButton" parent="." instance=ExtResource("2_btn")]
 layout_mode = 1

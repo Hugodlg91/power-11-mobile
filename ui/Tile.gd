@@ -19,9 +19,6 @@ func setup(val: int, p_size: int, pos_grid: Vector2i, pos_px: Vector2, theme_nam
 	position = pos_px
 	size = Vector2(p_size, p_size)
 	
-	bg_panel.size = Vector2(p_size, p_size)
-	number_label.size = Vector2(p_size, p_size)
-	
 	update_appearance(theme_name)
 
 func update_appearance(theme_name: String) -> void:
@@ -39,12 +36,17 @@ func update_appearance(theme_name: String) -> void:
 	number_label.modulate = UIAssets.get_tile_text_color(value, theme_name)
 	
 	# Initial Font Sizing
-	if value < 100:
-		number_label.add_theme_font_size_override("font_size", int(tile_size * 0.5))
+	var font_scale = 0.5
+	if value < 10:
+		font_scale = 0.55
+	elif value < 100:
+		font_scale = 0.45 
 	elif value < 1000:
-		number_label.add_theme_font_size_override("font_size", int(tile_size * 0.4))
+		font_scale = 0.35
 	else:
-		number_label.add_theme_font_size_override("font_size", int(tile_size * 0.3))
+		font_scale = 0.25
+		
+	number_label.add_theme_font_size_override("font_size", int(tile_size * font_scale))
 
 func animate_spawn() -> void:
 	pivot_offset = Vector2(tile_size/2.0, tile_size/2.0)
