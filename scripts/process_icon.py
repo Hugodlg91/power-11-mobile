@@ -56,6 +56,15 @@ def process_icon():
         fg_img.save(output_fg_path)
         print(f"Created {output_fg_path}")
         
+        # 3. Create Padded Main Icon (Foreground on Background)
+        # This serves as a universal safe fallback
+        padded_img = Image.new("RGBA", target_size, bg_color)
+        padded_img.paste(resized_img, (paste_x, paste_y), resized_img)
+        
+        output_padded_path = "assets/game_icon_padded.png"
+        padded_img.save(output_padded_path)
+        print(f"Created {output_padded_path}")
+        
     except Exception as e:
         print(f"An error occurred: {e}")
 
