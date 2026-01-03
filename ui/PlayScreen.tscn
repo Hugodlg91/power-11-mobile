@@ -27,7 +27,7 @@ layout_mode = 1
 anchors_preset = 10
 anchor_right = 1.0
 offset_left = 20.0
-offset_top = 20.0
+offset_top = 40.0
 offset_right = -20.0
 offset_bottom = 120.0
 grow_horizontal = 2
@@ -35,43 +35,55 @@ grow_horizontal = 2
 [node name="Title" type="Label" parent="Header"]
 layout_mode = 2
 size_flags_horizontal = 3
-theme_override_colors/font_color = Color(1, 0.843137, 0, 1)
-theme_override_font_sizes/font_size = 64
+theme_override_colors/font_color = Color(0.6, 0.4, 0.2, 1)
+theme_override_font_sizes/font_size = 56
 text = "POWER 11"
 
-[node name="ScoreBox" type="VBoxContainer" parent="Header"]
-custom_minimum_size = Vector2(100, 0)
+[node name="ScoreContainer" type="VBoxContainer" parent="."]
+layout_mode = 1
+anchors_preset = 1
+anchor_left = 1.0
+anchor_right = 1.0
+offset_left = -250.0
+offset_top = 40.0
+offset_right = -20.0
+offset_bottom = 200.0
+grow_horizontal = 0
+alignment = 2
+
+[node name="ScoreBox" type="VBoxContainer" parent="ScoreContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Header/ScoreBox"]
+[node name="Label" type="Label" parent="ScoreContainer/ScoreBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.466667, 0.431373, 0.396078, 1)
+theme_override_colors/font_color = Color(0.2, 0.2, 0.2, 1)
+theme_override_font_sizes/font_size = 24
 text = "SCORE"
-horizontal_alignment = 1
+horizontal_alignment = 2
 
-[node name="Value" type="Label" parent="Header/ScoreBox"]
+[node name="Value" type="Label" parent="ScoreContainer/ScoreBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.466667, 0.431373, 0.396078, 1)
-theme_override_font_sizes/font_size = 24
+theme_override_colors/font_color = Color(0.1, 0.1, 0.1, 1)
+theme_override_font_sizes/font_size = 64
 text = "0"
-horizontal_alignment = 1
+horizontal_alignment = 2
 
-[node name="BestBox" type="VBoxContainer" parent="Header"]
-custom_minimum_size = Vector2(100, 0)
+[node name="BestBox" type="VBoxContainer" parent="ScoreContainer"]
 layout_mode = 2
 
-[node name="Label" type="Label" parent="Header/BestBox"]
+[node name="Label" type="Label" parent="ScoreContainer/BestBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.466667, 0.431373, 0.396078, 1)
+theme_override_colors/font_color = Color(0.4, 0.4, 0.4, 1)
+theme_override_font_sizes/font_size = 16
 text = "BEST"
-horizontal_alignment = 1
+horizontal_alignment = 2
 
-[node name="Value" type="Label" parent="Header/BestBox"]
+[node name="Value" type="Label" parent="ScoreContainer/BestBox"]
 layout_mode = 2
-theme_override_colors/font_color = Color(0.466667, 0.431373, 0.396078, 1)
+theme_override_colors/font_color = Color(0.3, 0.3, 0.3, 1)
 theme_override_font_sizes/font_size = 24
 text = "0"
-horizontal_alignment = 1
+horizontal_alignment = 2
 
 [node name="GameBoard" parent="." instance=ExtResource("4_board")]
 layout_mode = 1
@@ -86,6 +98,8 @@ offset_right = 200.0
 offset_bottom = 250.0
 grow_horizontal = 2
 grow_vertical = 2
+scale = Vector2(2.2, 2.2)
+pivot_offset = Vector2(200, 200)
 
 [node name="GameOverOverlay" type="ColorRect" parent="."]
 visible = false
