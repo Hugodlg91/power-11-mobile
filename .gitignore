@@ -23,3 +23,6 @@ Thumbs.db
 .vs/
 *.tmp
 *.log
+
+# Exclude Tests from Repo
+tests/
