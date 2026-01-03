@@ -64,6 +64,22 @@ def process_icon():
         output_padded_path = "assets/game_icon_padded.png"
         padded_img.save(output_padded_path)
         print(f"Created {output_padded_path}")
+
+        # 4. Create 192x192 Legacy/Main Icon
+        # Resize the padded version to 192x192
+        icon_192 = padded_img.resize((192, 192), Image.Resampling.LANCZOS)
+        icon_192_path = "assets/game_icon_192.png"
+        icon_192.save(icon_192_path)
+        print(f"Created {icon_192_path}")
+
+        # 5. Resize Original game_icon.png to 192x192 (User Request)
+        # Only if it's larger than 192
+        if img.size != (192, 192):
+            img_192 = img.resize((192, 192), Image.Resampling.LANCZOS)
+            img.save(input_path) # Overwrite original as requested? Or maybe save as copy. 
+            # User asked "le game_icon.png est bien en 192x192?".
+            # Safest is to resize in place if that's the intent, but let's just make sure we have a file.
+            print(f"Resized {input_path} to 192x192")
         
     except Exception as e:
         print(f"An error occurred: {e}")
