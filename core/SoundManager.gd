@@ -36,25 +36,30 @@ func _start_music_player(stream: AudioStream) -> void:
 		
 	music_player = AudioStreamPlayer.new()
 	music_player.name = "MusicPlayer"
-	# music_player.bus = "Master" # Start simpler - Default is Master
+	music_player.bus = "Master"
 	music_player.stream = stream
 	add_child(music_player)
 	
-	# Fail-safe loop
+	# Loop handling
 	music_player.finished.connect(func(): 
-		print("SoundManager: Loop restart")
-		music_player.play()
+		if not Settings.get_setting("music_muted", false):
+			music_player.play()
 	)
 	
-	# FORCE VOLUME FOR DEBUG - Bypass Settings
-	music_player.volume_db = 0.0 
-	
+	_update_music_volume()
 	music_player.play()
-	print("SoundManager: Music started. Forced 0dB. Stream: ", stream.resource_path)
+	print("SoundManager: Music player initialized")
 
 func _update_music_volume() -> void:
-	# Disabled for debug
-	pass
+	if not music_player: return
+	
+	var m_muted = Settings.get_setting("music_muted", false)
+	var m_vol = Settings.get_setting("music_volume", 1.0)
+	
+	if m_muted:
+		music_player.volume_db = -80.0
+	else:
+		music_player.volume_db = linear_to_db(m_vol)
 
 func play(sfx_name: String) -> void:
 	if Settings.get_setting("sfx_muted", false):
