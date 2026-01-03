@@ -2,8 +2,8 @@ extends Control
 
 # NODES
 @onready var game_board: Control = $GameBoard
-@onready var score_label: Label = $Header/ScoreBox/Value
-@onready var best_label: Label = $Header/BestBox/Value
+@onready var score_label: Label = $ScoreContainer/ScoreBox/Value
+@onready var best_label: Label = $ScoreContainer/BestBox/Value
 @onready var game_over_overlay: Control = $GameOverOverlay
 @onready var bg: ColorRect = $ColorRect
 
@@ -47,7 +47,8 @@ func _ready() -> void:
 		add_child(leaderboard_mgr)
 	
 	# Setup GameBoard (matching VersusScreen approach)
-	var board_size = 400.0  # Adjust based on your UI
+	# Setup GameBoard (matching VersusScreen approach)
+	var board_size = 700.0  # Absolute MAX (97% of screen width)
 	var margin = 10
 	game_board.setup(board_size, margin)
 	game_board.setup(board_size, margin)

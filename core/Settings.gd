@@ -30,6 +30,11 @@ var default_settings = {
 var current_settings: Dictionary = {}
 
 func _ready() -> void:
+	if OS.has_feature("mobile"): # Force portrait on mobile
+		var os_name = OS.get_name()
+		if os_name == "Android" or os_name == "iOS":
+			DisplayServer.screen_set_orientation(1) # 1 = PORTRAIT
+	
 	load_settings()
 	apply_settings()
 

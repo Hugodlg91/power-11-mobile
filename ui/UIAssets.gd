@@ -84,7 +84,7 @@ static func get_tile_color(value: int, theme_name: String = "Classic") -> Color:
 		return tiles[value]
 	return theme["tiles_fallback"]
 
-static func get_tile_text_color(value: int, theme_name: String = "Classic") -> Color:
+static func get_tile_text_color(_value: int, theme_name: String = "Classic") -> Color:
 	if theme_name == "Classic":
 		return Color8(119, 110, 101) # text_dark for all
 	elif theme_name == "Cyberpunk":

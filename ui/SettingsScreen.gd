@@ -21,6 +21,10 @@ func _ready() -> void:
 	# Connect to theme changes
 	Settings.connect("theme_changed", _on_theme_changed)
 	
+	# Hide controls on mobile
+	if DisplayServer.is_touchscreen_available():
+		$Content/Keys.visible = false
+	
 	update_ui()
 	
 	theme_btn.pressed.connect(_cycle_theme)
@@ -109,7 +113,8 @@ func _input(event: InputEvent) -> void:
 			if btn:
 				btn.text = "INVALID"
 				await get_tree().create_timer(0.5).timeout
-				update_ui()
+				if is_inside_tree():
+					update_ui()
 			listening_action = ""
 			return
 		
@@ -122,7 +127,8 @@ func _input(event: InputEvent) -> void:
 			if btn:
 				btn.text = "DUPLICATE"
 				await get_tree().create_timer(0.5).timeout
-				update_ui()
+				if is_inside_tree():
+					update_ui()
 			listening_action = ""
 			return
 		

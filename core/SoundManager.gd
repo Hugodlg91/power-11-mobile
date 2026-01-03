@@ -26,9 +26,8 @@ func play(sfx_name: String) -> void:
 		return
 		
 	var path = SOUND_FILES[sfx_name]
-	if not FileAccess.file_exists(path):
-		print("SoundManager: Sound file not found: " + path)
-		return
+	# On export, FileAccess.file_exists returns false for imported resources (source stripped).
+	# We trust load() to handle the internal remapping.
 		
 	var stream = load(path)
 	if not stream:
